@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>学习计划 - 初中生学习助手</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8C42;
+            --primary-light: #FFF0E6;
+            --secondary: #4ECDC4;
+            --success: #2ECC71;
+            --warning: #F1C40F;
+            --danger: #E74C3C;
+            --gray: #95A5A6;
+            --text: #2C3E50;
+            --text-light: #7F8C8D;
+            --border: #ECF0F1;
+            --background: #F8F9FA;
+            --white: #FFFFFF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+            color: var(--text);
+            background: #f5f5f5;
+        }
+        #root {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--background);
+            position: relative;
+        }
+        @media (min-width: 481px) {
+            body { padding: 20px; }
+            #root { min-height: calc(100vh - 40px); border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        }
+        .app { min-height: 100vh; padding-bottom: 80px; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title { font-size: 14px; color: var(--text-light); }
+        .header-greeting { font-size: 20px; font-weight: 700; margin-top: 4px; }
+        .points-badge {
+            display: flex; align-items: center; gap: 4px;
+            background: var(--primary-light);
+            padding: 8px 14px; border-radius: 20px;
+        }
+        .points-badge span:last-child { font-size: 16px; font-weight: 700; color: var(--primary); }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex; gap: 8px; padding: 12px 16px;
+            background: var(--white); overflow-x: auto;
+        }
+        .category-tab {
+            padding: 8px 16px; border-radius: 20px;
+            border: none; background: var(--background);
+            font-size: 14px; color: var(--text-light);
+            cursor: pointer; white-space: nowrap;
+        }
+        .category-tab.active {
+            background: var(--primary); color: var(--white);
+        }
+
+        /* Cat Section */
+        .cat-section {
+            background: linear-gradient(135deg, #FFF5F0 0%, #FFE8E0 100%);
+            padding: 20px;
+            text-align: center;
+        }
+        .cat-bubble {
+            width: 120px; height: 120px;
+            border-radius: 50%; margin: 0 auto 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 70px; background: rgba(46, 204, 113, 0.15);
+            border: 4px solid #fff;
+            box-shadow: 0 12px 40px rgba(255, 140, 66, 0.25);
+        }
+        .cat-name { font-size: 20px; font-weight: 700; }
+        .cat-status { font-size: 14px; margin-top: 4px; font-weight: 500; }
+        .food-stock {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 12px; padding: 10px 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+        }
+        .food-stock .emoji { font-size: 28px; }
+        .food-stock .count { font-size: 18px; font-weight: 700; color: var(--primary); }
+
+        /* Progress Ring */
+        .progress-section {
+            background: var(--white); padding: 16px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .progress-ring { position: relative; width: 100px; height: 100px; }
+        .progress-ring svg { transform: rotate(-90deg); }
+        .progress-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .progress-percent { font-size: 24px; font-weight: 700; }
+        .progress-label { font-size: 11px; color: var(--text-light); }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 20px; border-radius: 10px; border: none;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--primary); color: var(--white);
+            width: calc(100% - 32px); margin: 12px 16px;
+        }
+        .btn-secondary {
+            background: var(--border); color: var(--text);
+        }
+        .btn-success {
+            background: var(--success); color: var(--white);
+        }
+        .btn-outline {
+            background: transparent; border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        /* Task List */
+        .task-section { margin-bottom: 8px; }
+        .section-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 16px; font-size: 14px; font-weight: 600;
+        }
+        .section-header .icon { font-size: 18px; }
+        .section-header.in-class { color: #3498DB; background: rgba(52, 152, 219, 0.1); }
+        .section-header.extra { color: #9B59B6; background: rgba(155, 89, 182, 0.1); }
+        .section-header.rolled { color: #E67E22; background: rgba(230, 126, 34, 0.1); }
+
+        .task-item {
+            display: flex; align-items: center;
+            background: var(--white);
+            padding: 12px 16px; margin: 0 16px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .task-checkbox {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; margin-right: 12px;
+            cursor: pointer; flex-shrink: 0;
+            border: 2px solid var(--border);
+        }
+        .task-checkbox.pending { border-color: var(--primary); color: var(--primary); }
+        .task-checkbox.completed { background: var(--success); border-color: var(--success); color: #fff; }
+        .task-checkbox.rolled { border-color: var(--warning); color: var(--warning); }
+
+        .task-content { flex: 1; min-width: 0; }
+        .task-title {
+            font-size: 14px; font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .task-title.completed { text-decoration: line-through; color: var(--text-light); }
+        .task-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .task-tag {
+            padding: 2px 8px; border-radius: 8px;
+            font-size: 10px; font-weight: 500;
+        }
+        .task-tag.math { background: rgba(52, 152, 219, 0.15); color: #3498DB; }
+        .task-tag.chinese { background: rgba(231, 76, 60, 0.15); color: #E74C3C; }
+        .task-tag.english { background: rgba(155, 89, 182, 0.15); color: #9B59B6; }
+        .task-tag.physics { background: rgba(243, 156, 18, 0.15); color: #F39C12; }
+        .task-tag.chemistry { background: rgba(26, 188, 156, 0.15); color: #1ABC9C; }
+        .task-tag.biology { background: rgba(39, 174, 96, 0.15); color: #27AE60; }
+        .task-tag.history { background: rgba(230, 126, 34, 0.15); color: #E67E22; }
+        .task-tag.geography { background: rgba(22, 160, 133, 0.15); color: #16A085; }
+        .task-tag.politics { background: rgba(41, 128, 185, 0.15); color: #2980B9; }
+        .task-tag.extra { background: rgba(78, 205, 196, 0.15); color: var(--secondary); }
+        .task-tag.rolled { background: rgba(241, 196, 15, 0.2); color: #F39C12; }
+        .task-tag.reminder { background: rgba(241, 196, 15, 0.15); color: var(--warning); }
+        .task-tag.evaluation {
+            background: var(--success); color: #fff;
+            display: inline-flex; align-items: center; gap: 2px;
+        }
+
+        .task-actions {
+            display: flex; gap: 6px; flex-direction: column;
+        }
+        .task-action-btn {
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 11px; font-weight: 600; border: none;
+            cursor: pointer;
+        }
+        .task-action-btn.complete {
+            background: rgba(46, 204, 113, 0.15); color: var(--success);
+        }
+        .task-action-btn.postpone {
+            background: rgba(241, 196, 15, 0.15); color: #F39C12;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px;
+            background: var(--white);
+            display: flex; justify-content: space-around;
+            padding: 10px 0 20px;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 4px; padding: 6px 16px;
+            border: none; background: none; cursor: pointer;
+        }
+        .nav-item.active { background: var(--primary-light); border-radius: 12px; }
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 11px; color: var(--text-light); }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 200;
+            display: flex; align-items: flex-end; justify-content: center;
+        }
+        .modal-content {
+            width: 100%; max-width: 480px; max-height: 90vh;
+            overflow-y: auto; background: var(--background);
+            border-radius: 24px 24px 0 0;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0;
+        }
+        .modal-title { font-size: 17px; font-weight: 600; }
+        .modal-close { font-size: 15px; color: var(--text-light); background: none; border: none; cursor: pointer; }
+        .modal-body { padding: 20px; }
+
+        /* Evaluation Modal */
+        .evaluation-section {
+            background: var(--white);
+            padding: 16px; border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .evaluation-title {
+            font-size: 14px; font-weight: 600; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .evaluation-options {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .evaluation-tag {
+            padding: 8px 14px; border-radius: 20px;
+            border: 2px solid var(--border);
+            background: var(--white);
+            font-size: 13px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .evaluation-tag:hover { border-color: var(--primary); }
+        .evaluation-tag.selected {
+            background: var(--success); color: #fff;
+            border-color: var(--success);
+        }
+        .evaluation-tag.negative {
+            background: rgba(231, 76, 60, 0.1); color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .points-preview {
+            background: var(--primary-light);
+            padding: 16px; border-radius: 12px;
+            text-align: center; margin-top: 16px;
+        }
+        .points-preview .label { font-size: 13px; color: var(--text-light); }
+        .points-preview .value {
+            font-size: 32px; font-weight: 700; color: var(--primary);
+        }
+
+        /* Postpone Modal */
+        .postpone-reasons {
+            display: flex; flex-direction: column; gap: 10px;
+            margin-bottom: 16px;
+        }
+        .reason-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px; background: var(--white);
+            border-radius: 12px; border: 2px solid var(--border);
+            cursor: pointer;
+        }
+        .reason-item.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .reason-icon { font-size: 24px; }
+        .reason-text { flex: 1; font-size: 14px; }
+
+        .datetime-picker {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            margin-bottom: 16px;
+        }
+        .datetime-field {
+            background: var(--white); padding: 12px; border-radius: 10px;
+        }
+        .datetime-field label {
+            display: block; font-size: 12px; color: var(--text-light); margin-bottom: 4px;
+        }
+        .datetime-field input, .datetime-field select {
+            width: 100%; border: none; font-size: 16px; font-weight: 600;
+            background: transparent;
+        }
+
+        .capture-buttons {
+            display: flex; gap: 12px; margin-bottom: 16px;
+        }
+        .capture-btn {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; gap: 8px; padding: 20px;
+            background: var(--white); border: 2px dashed var(--primary);
+            border-radius: 12px; cursor: pointer;
+        }
+        .capture-btn .icon { font-size: 32px; }
+        .capture-btn .text { font-size: 13px; color: var(--primary); }
+
+        .voice-input {
+            background: var(--white); padding: 16px; border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .voice-btn {
+            width: 100%; padding: 16px;
+            background: var(--secondary); color: #fff;
+            border: none; border-radius: 10px;
+            font-size: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .voice-result {
+            margin-top: 12px; padding: 12px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 8px; font-size: 14px;
+        }
+
+        /* Form */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+        .form-input {
+            width: 100%; padding: 14px 16px;
+            border: 1px solid var(--border); border-radius: 12px;
+            font-size: 15px; font-family: inherit;
+        }
+        .subject-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .subject-item {
+            aspect-ratio: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: var(--white); border: 2px solid var(--border);
+            border-radius: 12px; cursor: pointer; font-size: 12px;
+            transition: all 0.2s;
+        }
+        .subject-item:hover, .subject-item.selected { border-color: var(--primary); background: var(--primary-light); }
+        .subject-item .emoji { font-size: 24px; margin-bottom: 2px; }
+
+        /* Celebration */
+        .celebration-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 300;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .celebration-content {
+            background: var(--white); padding: 30px 40px; border-radius: 20px;
+            text-align: center; animation: popIn 0.4s ease;
+            max-width: 320px;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .evaluation-list {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-top: 12px;
+        }
+        .eval-tag {
+            padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 500;
+        }
+        .eval-tag.positive { background: var(--success); color: #fff; }
+        .eval-tag.negative { background: rgba(231, 76, 60, 0.15); color: var(--danger); }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="app">
+            <!-- Home Page -->
+            <div class="page active" id="home-page">
+                <div class="header">
+                    <div>
+                        <div class="header-title" id="today-date">今天</div>
+                        <div class="header-greeting">今天也要加油哦！💪</div>
+                    </div>
+                    <div class="points-badge">
+                        <span>⭐</span>
+                        <span id="total-points">150</span>
+                    </div>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <button class="category-tab active" onclick="filterCategory('all')">全部</button>
+                    <button class="category-tab" onclick="filterCategory('in-class')">📚 课内</button>
+                    <button class="category-tab" onclick="filterCategory('extracurricular')">🎯 课外</button>
+                    <button class="category-tab" onclick="filterCategory('rolled')">📌 遗留</button>
+                </div>
+
+                <!-- Cat Section -->
+                <div class="cat-section">
+                    <div class="cat-bubble" id="cat-emoji">😸</div>
+                    <div class="cat-name">小猫咪</div>
+                    <div class="cat-status" id="cat-status" style="color: #27AE60;">状态: 很开心</div>
+                    <div class="food-stock">
+                        <span class="emoji">🥣</span>
+                        <div>
+                            <div style="font-size: 12px; color: #7F8C8D;">猫粮库存</div>
+                            <div class="count" id="cat-food">5 碗</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-section">
+                    <div class="progress-ring">
+                        <svg width="100" height="100">
+                            <circle fill="none" stroke="#ECF0F1" stroke-width="8" cx="50" cy="50" r="42"></circle>
+                            <circle id="progress-circle" fill="none" stroke="#FF8C42" stroke-width="8" stroke-linecap="round"
+                                    cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="66"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-percent" id="progress-percent">75%</div>
+                            <div class="progress-label">今日完成</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showAddTask()">+ 添加新任务</button>
+
+                <!-- Task Lists -->
+                <div id="task-container">
+                    <!-- 课内任务 -->
+                    <div class="task-section" id="in-class-section">
+                        <div class="section-header in-class">
+                            <span class="icon">📚</span>
+                            <span>课内学习 (<span id="in-class-count">0/0</span>)</span>
+                        </div>
+                        <div id="in-class-tasks"></div>
+                    </div>
+
+                    <!-- 课外任务 -->
+                    <div class="task-section" id="extra-section">
+                        <div class="section-header extra">
+                            <span class="icon">🎯</span>
+                            <span>课外学习 (<span id="extra-count">0/0</span>)</span>
+                        </div>
+                        <div id="extra-tasks"></div>
+                    </div>
+
+                    <!-- 遗留任务 -->
+                    <div class="task-section" id="rolled-section">
+                        <div class="section-header rolled">
+                            <span class="icon">📌</span>
+                            <span>遗留任务 (<span id="rolled-count">0/0</span>)</span>
+                        </div>
+                        <div id="rolled-tasks"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pet Page -->
+            <div class="page" id="pet-page">
+                <div class="header">
+                    <h1 style="font-size: 20px; font-weight: 700;">我的猫咪</h1>
+                    <div class="points-badge">
+                        <span>⭐</span>
+                        <span id="pet-total-points">150</span>
+                    </div>
+                </div>
+
+                <div class="cat-section" style="padding: 30px 20px;">
+                    <div class="cat-bubble" id="pet-cat-emoji" style="width: 140px; height: 140px; font-size: 80px;">😸</div>
+                    <div class="cat-name">小猫咪</div>
+                    <div class="cat-status" id="pet-cat-status" style="color: #27AE60;">状态: 很开心</div>
+                    <div class="food-stock" style="margin-top: 16px;">
+                        <span class="emoji">🥣</span>
+                        <div class="count" id="pet-cat-food">5 碗</div>
+                    </div>
+                </div>
+
+                <div style="padding: 20px; text-align: center;">
+                    <button class="btn btn-primary" style="width: 80%; margin: 0 auto 12px;" onclick="feedCat()" id="feed-btn">
+                        🐱 投喂小猫咪
+                    </button>
+                    <div style="font-size: 13px; color: #7F8C8D;">
+                        每投喂1碗猫粮，小猫咪会更开心！
+                    </div>
+                </div>
+
+                <div style="padding: 0 16px;">
+                    <div style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                        <div style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">💡 猫粮获取方式</div>
+                        <ul style="font-size: 13px; color: #7F8C8D; line-height: 1.8; padding-left: 20px;">
+                            <li>完成任务获得10积分 = 1碗猫粮</li>
+                            <li>任务评价标签每个+2积分</li>
+                            <li>连续打卡有额外奖励</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Nav -->
+            <nav class="bottom-nav">
+                <button class="nav-item active" onclick="switchPage('home')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">首页</span>
+                </button>
+                <button class="nav-item" onclick="switchPage('pet')">
+                    <span class="nav-icon">🐱</span>
+                    <span class="nav-label">宠物</span>
+                </button>
+            </nav>
+
+            <!-- Add Task Modal -->
+            <div class="modal-overlay hidden" id="add-task-modal" onclick="hideAddTask()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <button class="modal-close" onclick="hideAddTask()">取消</button>
+                        <div class="modal-title">添加任务</div>
+                        <button class="modal-close" style="color: #FF8C42;" onclick="saveTask()">保存</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">任务名称</label>
+                            <input type="text" class="form-input" id="new-task-title" placeholder="例如：完成数学作业第23页">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">任务分类</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                                <button class="btn" style="flex: 1;" id="cat-in-class" onclick="selectCategory('in-class')">📚 课内</button>
+                                <button class="btn btn-secondary" style="flex: 1;" id="cat-extra" onclick="selectCategory('extracurricular')">🎯 课外</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="subject-select-group">
+                            <label class="form-label">选择学科</label>
+                            <div class="subject-grid">
+                                <div class="subject-item" onclick="selectSubject(this, 'chinese')">
+                                    <span class="emoji">📖</span>
+                                    <span>语文</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'math')">
+                                    <span class="emoji">🔢</span>
+                                    <span>数学</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'english')">
+                                    <span class="emoji">🔤</span>
+                                    <span>英语</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'physics')">
+                                    <span class="emoji">⚡</span>
+                                    <span>物理</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'chemistry')">
+                                    <span class="emoji">🧪</span>
+                                    <span>化学</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'biology')">
+                                    <span class="emoji">🌱</span>
+                                    <span>生物</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'history')">
+                                    <span class="emoji">🏛️</span>
+                                    <span>历史</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'geography')">
+                                    <span class="emoji">🌍</span>
+                                    <span>地理</span>
+                                </div>
+                                <div class="subject-item" onclick="selectSubject(this, 'politics')">
+                                    <span class="emoji">📜</span>
+                                    <span>政治</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">提醒时间</label>
+                            <input type="time" class="form-input" id="new-task-time" value="19:00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evaluation Modal (完成任务评价) -->
+            <div class="modal-overlay hidden" id="evaluation-modal" onclick="hideEvaluation()">
+                <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 95vh;">
+                    <div class="modal-header">
+                        <button class="modal-close" onclick="hideEvaluation()">取消</button>
+                        <div class="modal-title">✓ 完成任务评价</div>
+                        <button class="modal-close" style="color: var(--success);" onclick="saveEvaluation()">确认</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background: var(--white); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                            <div style="font-size: 14px; color: #7F8C8D;">任务</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-top: 4px;" id="eval-task-title">数学作业</div>
+                        </div>
+
+                        <div class="evaluation-section">
+                            <div class="evaluation-title">📝 学习态度</div>
+                            <div class="evaluation-options">
+                                <div class="evaluation-tag" onclick="toggleEvaluation(this, 'attitude', 'serious')">态度认真</div>
+                                <div class="evaluation-tag negative" onclick="toggleEvaluation(this, 'attitude', 'casual')">态度不认真</div>
+                            </div>
+                        </div>
+
+                        <div class="evaluation-section">
+                            <div class="evaluation-title">✍️ 书写规范</div>
+                            <div class="evaluation-options">
+                                <div class="evaluation-tag" onclick="toggleEvaluation(this, 'writing', 'standard')">书写规范</div>
+                                <div class="evaluation-tag negative" onclick="toggleEvaluation(this, 'writing', 'messy')">书写潦草</div>
+                            </div>
+                        </div>
+
+                        <div class="evaluation-section">
+                            <div class="evaluation-title">📄 草稿情况</div>
+                            <div class="evaluation-options">
+                                <div class="evaluation-tag" onclick="toggleEvaluation(this, 'draft', 'careful')">草稿认真</div>
+                                <div class="evaluation-tag negative" onclick="toggleEvaluation(this, 'draft', 'none')">无草稿</div>
+                            </div>
+                        </div>
+
+                        <div class="evaluation-section">
+                            <div class="evaluation-title">🖍️ 做题痕迹</div>
+                            <div class="evaluation-options">
+                                <div class="evaluation-tag" onclick="toggleEvaluation(this, 'marks', 'marked')">痕迹标注</div>
+                                <div class="evaluation-tag negative" onclick="toggleEvaluation(this, 'marks', 'none')">无标注</div>
+                            </div>
+                        </div>
+
+                        <div class="points-preview">
+                            <div class="label">预计获得</div>
+                            <div class="value"><span id="preview-points">10</span> 积分</div>
+                            <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
+                                基础10分 + 评价标签 <span id="tag-count">0</span> × 2分
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Postpone Modal (改期功能) -->
+            <div class="modal-overlay hidden" id="postpone-modal" onclick="hidePostpone()">
+                <div class="modal-content" onclick="event.stopPropagation()" style="max-height: 95vh;">
+                    <div class="modal-header">
+                        <button class="modal-close" onclick="hidePostpone()">取消</button>
+                        <div class="modal-title">📅 改期处理</div>
+                        <button class="modal-close" style="color: var(--warning);" onclick="savePostpone()">确认改期</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background: var(--white); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                            <div style="font-size: 14px; color: #7F8C8D;">任务</div>
+                            <div style="font-size: 16px; font-weight: 600; margin-top: 4px;" id="postpone-task-title">数学作业</div>
+                        </div>
+
+                        <div class="form-label">改期原因</div>
+                        <div class="postpone-reasons">
+                            <div class="reason-item" onclick="selectReason(this, 'think')">
+                                <span class="reason-icon">🤔</span>
+                                <span class="reason-text">题目需要继续思考</span>
+                            </div>
+                            <div class="reason-item" onclick="selectReason(this, 'practice')">
+                                <span class="reason-icon">✏️</span>
+                                <span class="reason-text">需要举一反三练习</span>
+                            </div>
+                            <div class="reason-item" onclick="selectReason(this, 'other')">
+                                <span class="reason-icon">📝</span>
+                                <span class="reason-text">其他原因</span>
+                            </div>
+                        </div>
+
+                        <div class="form-label">改期到</div>
+                        <div class="datetime-picker">
+                            <div class="datetime-field">
+                                <label>日期</label>
+                                <input type="date" id="postpone-date">
+                            </div>
+                            <div class="datetime-field">
+                                <label>时间</label>
+                                <input type="time" id="postpone-time" value="19:00">
+                            </div>
+                        </div>
+
+                        <div class="form-label">拍照记录（可选）</div>
+                        <div class="capture-buttons">
+                            <div class="capture-btn" onclick="simulateCapture('photo')">
+                                <span class="icon">📷</span>
+                                <span class="text">拍照记录</span>
+                            </div>
+                        </div>
+                        <div id="captured-photos" style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;"></div>
+
+                        <div class="form-label">语音说明（可选）</div>
+                        <div class="voice-input">
+                            <button class="voice-btn" onclick="toggleVoiceRecord()">
+                                <span id="voice-icon">🎤</span>
+                                <span id="voice-text">按住录音</span>
+                            </button>
+                            <div class="voice-result hidden" id="voice-result">
+                                "这道题太难了，需要问老师..."
+                            </div>
+                        </div>
+
+                        <div style="background: #FFF9E6; padding: 12px; border-radius: 10px; font-size: 13px; color: #B7950B;">
+                            💡 改期后任务将移动到指定日期，原任务标记为已处理
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Celebration Modal -->
+            <div class="modal-overlay hidden" id="celebration-modal" onclick="hideCelebration()">
+                <div class="celebration-content" onclick="event.stopPropagation()">
+                    <div style="font-size: 60px; margin-bottom: 10px;">🐱</div>
+                    <div style="font-size: 48px; margin: 15px 0;">🥣</div>
+                    <div style="font-size: 20px; font-weight: 600; color: #FF8C42; margin-bottom: 8px;">获得猫粮!</div>
+
+                    <div class="evaluation-list" id="celebration-tags"></div>
+
+                    <div style="font-size: 14px; color: #7F8C8D; margin: 12px 0;">
+                        基础10分 + 评价 <span id="celebration-tag-count">0</span> × 2分
+                    </div>
+
+                    <div style="padding: 12px 24px; background: #FFF0E6; border-radius: 20px; color: #FF8C42; font-weight: 600;">
+                        ⭐ +<span id="celebration-points">10</span> 积分
+                    </div>
+                    <div style="font-size: 13px; color: #7F8C8D; margin-top: 8px;">
+                        总积分: <span id="celebration-total">160</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            totalPoints: 150,
+            catFood: 5,
+            streakDays: 5,
+            tasks: [
+                { id: 1, title: '完成数学作业第23页', category: 'in-class', subject: 'math', subjectName: '数学', status: 'pending', reminderTime: '19:00' },
+                { id: 2, title: '背诵古诗《静夜思》', category: 'in-class', subject: 'chinese', subjectName: '语文', status: 'completed', reminderTime: '19:30', evaluation: { attitude: 'serious', writing: 'standard' } },
+                { id: 3, title: '英语单词记忆20个', category: 'in-class', subject: 'english', subjectName: '英语', status: 'pending', reminderTime: '20:00' },
+                { id: 4, title: '课外阅读30分钟', category: 'extracurricular', subject: 'reading', subjectName: '课外阅读', status: 'completed', reminderTime: '20:30', evaluation: { attitude: 'serious' } },
+                { id: 5, title: '物理实验报告', category: 'rolled', subject: 'physics', subjectName: '物理', status: 'pending', reminderTime: '18:00', rolledFrom: '2024-03-13', reason: '题目需要继续思考' }
+            ],
+            currentFilter: 'all',
+            currentEvaluatingTask: null,
+            currentPostponingTask: null,
+            selectedEvaluations: {},
+            selectedReason: null,
+            isRecording: false
+        };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default date for postpone
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('postpone-date').value = tomorrow.toISOString().split('T')[0];
+
+            updateUI();
+        });
+
+        // Switch Page
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page + '-page').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Filter Category
+        function filterCategory(category) {
+            state.currentFilter = category;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTasks();
+        }
+
+        // Update UI
+        function updateUI() {
+            // Update points
+            document.getElementById('total-points').textContent = state.totalPoints;
+            document.getElementById('pet-total-points').textContent = state.totalPoints;
+
+            // Update cat
+            document.getElementById('cat-food').textContent = state.catFood + ' 碗';
+            document.getElementById('pet-cat-food').textContent = state.catFood + ' 碗';
+
+            const catEmoji = state.catFood >= 5 ? '😸' : state.catFood >= 2 ? '😺' : state.catFood >= 1 ? '😐' : '😿';
+            document.getElementById('cat-emoji').textContent = catEmoji;
+            document.getElementById('pet-cat-emoji').textContent = catEmoji;
+
+            const catStatus = state.catFood >= 5 ? '很开心' : state.catFood >= 2 ? '还不错' : state.catFood >= 1 ? '有点饿' : '非常饿';
+            const catColor = state.catFood >= 5 ? '#27AE60' : state.catFood >= 2 ? '#F39C12' : state.catFood >= 1 ? '#E67E22' : '#E74C3C';
+            document.getElementById('cat-status').textContent = '状态: ' + catStatus;
+            document.getElementById('cat-status').style.color = catColor;
+            document.getElementById('pet-cat-status').textContent = '状态: ' + catStatus;
+            document.getElementById('pet-cat-status').style.color = catColor;
+
+            // Progress
+            const completed = state.tasks.filter(t => t.status === 'completed').length;
+            const total = state.tasks.length;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('progress-percent').textContent = percent + '%';
+            document.getElementById('progress-circle').style.strokeDashoffset = 264 * (1 - percent / 100);
+
+            renderTasks();
+
+            // Feed button
+            const feedBtn = document.getElementById('feed-btn');
+            if (feedBtn) {
+                feedBtn.disabled = state.catFood <= 0;
+                feedBtn.textContent = state.catFood > 0 ? '🐱 投喂小猫咪' : '😿 猫粮不足';
+            }
+        }
+
+        // Render Tasks
+        function renderTasks() {
+            const inClassTasks = state.tasks.filter(t =>
+                t.category === 'in-class' && (state.currentFilter === 'all' || state.currentFilter === 'in-class')
+            );
+            const extraTasks = state.tasks.filter(t =>
+                t.category === 'extracurricular' && (state.currentFilter === 'all' || state.currentFilter === 'extracurricular')
+            );
+            const rolledTasks = state.tasks.filter(t =>
+                t.category === 'rolled' && (state.currentFilter === 'all' || state.currentFilter === 'rolled')
+            );
+
+            // Update counts
+            const inClassCompleted = inClassTasks.filter(t => t.status === 'completed').length;
+            const extraCompleted = extraTasks.filter(t => t.status === 'completed').length;
+            const rolledCompleted = rolledTasks.filter(t => t.status === 'completed').length;
+
+            document.getElementById('in-class-count').textContent = `${inClassCompleted}/${inClassTasks.length}`;
+            document.getElementById('extra-count').textContent = `${extraCompleted}/${extraTasks.length}`;
+            document.getElementById('rolled-count').textContent = `${rolledCompleted}/${rolledTasks.length}`;
+
+            // Render sections
+            document.getElementById('in-class-tasks').innerHTML = inClassTasks.map(t => renderTaskItem(t)).join('');
+            document.getElementById('extra-tasks').innerHTML = extraTasks.map(t => renderTaskItem(t)).join('');
+            document.getElementById('rolled-tasks').innerHTML = rolledTasks.map(t => renderTaskItem(t)).join('');
+
+            // Hide empty sections
+            document.getElementById('in-class-section').style.display = inClassTasks.length ? 'block' : 'none';
+            document.getElementById('extra-section').style.display = extraTasks.length ? 'block' : 'none';
+            document.getElementById('rolled-section').style.display = rolledTasks.length ? 'block' : 'none';
+        }
+
+        function renderTaskItem(task) {
+            const isCompleted = task.status === 'completed';
+            const isRolled = task.category === 'rolled';
+            const subjectColors = {
+                chinese: '#E74C3C', math: '#3498DB', english: '#9B59B6',
+                physics: '#F39C12', chemistry: '#1ABC9C', biology: '#27AE60',
+                history: '#E67E22', geography: '#16A085', politics: '#2980B9'
+            };
+
+            let evaluationTags = '';
+            if (task.evaluation) {
+                const tags = [];
+                if (task.evaluation.attitude === 'serious') tags.push('<span class="eval-tag positive">态度认真 +2</span>');
+                if (task.evaluation.writing === 'standard') tags.push('<span class="eval-tag positive">书写规范 +2</span>');
+                if (task.evaluation.draft === 'careful') tags.push('<span class="eval-tag positive">草稿认真 +2</span>');
+                if (task.evaluation.marks === 'marked') tags.push('<span class="eval-tag positive">痕迹标注 +2</span>');
+                evaluationTags = '<div class="evaluation-list">' + tags.join('') + '</div>';
+            }
+
+            let rolledBadge = '';
+ if (isRolled) {
+     rolledBadge = `<span class="task-tag rolled">📌 遗留</span>`;
+     if (task.reason) {
+         rolledBadge += `<span class="task-tag" style="background: #f0f0f0; color: #666; margin-left: 4px;">${task.reason}</span>`;
+     }
+ }
+
+            return `
+                <div class="task-item">
+                    <div class="task-checkbox ${isCompleted ? 'completed' : isRolled ? 'rolled' : 'pending'}"
+                         onclick="${isCompleted ? '' : `startCompleteTask(${task.id})`}">
+                        ${isCompleted ? '✓' : isRolled ? '⏳' : ''}
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title ${isCompleted ? 'completed' : ''}">${task.title}</div>
+                        <div class="task-meta">
+                            ${isRolled ? rolledBadge : `<span class="task-tag ${task.subject}">${task.subjectName}</span>`}
+                            ${task.reminderTime ? `<span class="task-tag reminder">⏰ ${task.reminderTime}</span>` : ''}
+                        </div>
+                        ${evaluationTags}
+                    </div>
+                    ${!isCompleted ? `
+                    <div class="task-actions">
+                        <button class="task-action-btn complete" onclick="startCompleteTask(${task.id})">完成</button>
+                        <button class="task-action-btn postpone" onclick="startPostponeTask(${task.id})">改期</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Complete Task with Evaluation
+        function startCompleteTask(id) {
+            state.currentEvaluatingTask = id;
+            state.selectedEvaluations = {};
+
+            const task = state.tasks.find(t => t.id === id);
+            document.getElementById('eval-task-title').textContent = task.title;
+
+            // Reset selections
+            document.querySelectorAll('.evaluation-tag').forEach(t => t.classList.remove('selected'));
+            updatePreviewPoints();
+
+            document.getElementById('evaluation-modal').classList.remove('hidden');
+        }
+
+        function toggleEvaluation(el, category, value) {
+            // Remove other selection in same category
+            el.parentElement.querySelectorAll('.evaluation-tag').forEach(t => t.classList.remove('selected'));
+
+            // Toggle current
+            if (state.selectedEvaluations[category] === value) {
+                delete state.selectedEvaluations[category];
+            } else {
+                el.classList.add('selected');
+                state.selectedEvaluations[category] = value;
+            }
+
+            updatePreviewPoints();
+        }
+
+        function updatePreviewPoints() {
+            const positiveCount = Object.values(state.selectedEvaluations).filter(v =>
+                v === 'serious' || v === 'standard' || v === 'careful' || v === 'marked'
+            ).length;
+            const totalPoints = 10 + positiveCount * 2;
+            document.getElementById('preview-points').textContent = totalPoints;
+            document.getElementById('tag-count').textContent = positiveCount;
+        }
+
+        function saveEvaluation() {
+            const task = state.tasks.find(t => t.id === state.currentEvaluatingTask);
+            if (task) {
+                task.status = 'completed';
+                task.evaluation = state.selectedEvaluations;
+
+                const positiveCount = Object.values(state.selectedEvaluations).filter(v =>
+                    v === 'serious' || v === 'standard' || v === 'careful' || v === 'marked'
+                ).length;
+                const earnedPoints = 10 + positiveCount * 2;
+
+                state.totalPoints += earnedPoints;
+                state.catFood += Math.floor(earnedPoints / 10);
+
+                hideEvaluation();
+                showCelebration(earnedPoints, positiveCount);
+                updateUI();
+            }
+        }
+
+        function hideEvaluation() {
+            document.getElementById('evaluation-modal').classList.add('hidden');
+        }
+
+        // Postpone Task
+        function startPostponeTask(id) {
+            state.currentPostponingTask = id;
+            state.selectedReason = null;
+
+            const task = state.tasks.find(t => t.id === id);
+            document.getElementById('postpone-task-title').textContent = task.title;
+
+            // Reset
+            document.querySelectorAll('.reason-item').forEach(r => r.classList.remove('selected'));
+            document.getElementById('captured-photos').innerHTML = '';
+            document.getElementById('voice-result').classList.add('hidden');
+
+            document.getElementById('postpone-modal').classList.remove('hidden');
+        }
+
+        function selectReason(el, reason) {
+            document.querySelectorAll('.reason-item').forEach(r => r.classList.remove('selected'));
+            el.classList.add('selected');
+            state.selectedReason = reason;
+        }
+
+        function simulateCapture(type) {
+            const container = document.getElementById('captured-photos');
+            const div = document.createElement('div');
+            div.style.cssText = 'width: 60px; height: 60px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;';
+            div.textContent = type === 'photo' ? '📷' : '🎤';
+            container.appendChild(div);
+        }
+
+        function toggleVoiceRecord() {
+            const icon = document.getElementById('voice-icon');
+            const text = document.getElementById('voice-text');
+            const result = document.getElementById('voice-result');
+
+            if (!state.isRecording) {
+                state.isRecording = true;
+                icon.textContent = '⏹️';
+                text.textContent = '录音中...';
+                setTimeout(() => {
+                    state.isRecording = false;
+                    icon.textContent = '🎤';
+                    text.textContent = '按住录音';
+                    result.classList.remove('hidden');
+                }, 1500);
+            }
+        }
+
+        function savePostpone() {
+            const task = state.tasks.find(t => t.id === state.currentPostponingTask);
+            if (task) {
+                const date = document.getElementById('postpone-date').value;
+                const time = document.getElementById('postpone-time').value;
+
+                // Move to rolled category with new date
+                task.category = 'rolled';
+                task.rolledFrom = new Date().toISOString().split('T')[0];
+                task.postponedTo = date;
+                task.reminderTime = time;
+                task.reason = state.selectedReason === 'think' ? '题目需要继续思考' :
+                              state.selectedReason === 'practice' ? '需要举一反三练习' : '其他原因';
+
+                hidePostpone();
+                updateUI();
+
+                // Show confirmation
+                alert(`任务已改期到 ${date} ${time}`);
+            }
+        }
+
+        function hidePostpone() {
+            document.getElementById('postpone-modal').classList.add('hidden');
+        }
+
+        // Celebration
+        function showCelebration(points, tagCount) {
+            const tagsHtml = [];
+            const evals = state.tasks.find(t => t.id === state.currentEvaluatingTask)?.evaluation || {};
+            if (evals.attitude === 'serious') tagsHtml.push('<span class="eval-tag positive">态度认真</span>');
+            if (evals.writing === 'standard') tagsHtml.push('<span class="eval-tag positive">书写规范</span>');
+            if (evals.draft === 'careful') tagsHtml.push('<span class="eval-tag positive">草稿认真</span>');
+            if (evals.marks === 'marked') tagsHtml.push('<span class="eval-tag positive">痕迹标注</span>');
+
+            document.getElementById('celebration-tags').innerHTML = tagsHtml.join('');
+            document.getElementById('celebration-points').textContent = points;
+            document.getElementById('celebration-tag-count').textContent = tagCount;
+            document.getElementById('celebration-total').textContent = state.totalPoints;
+
+            document.getElementById('celebration-modal').classList.remove('hidden');
+            setTimeout(hideCelebration, 3000);
+        }
+
+        function hideCelebration() {
+            document.getElementById('celebration-modal').classList.add('hidden');
+        }
+
+        // Feed Cat
+        function feedCat() {
+            if (state.catFood > 0) {
+                state.catFood -= 1;
+                updateUI();
+                const btn = document.getElementById('feed-btn');
+                btn.textContent = '小猫咪吃得很开心！喵~ 🐱';
+                setTimeout(() => updateUI(), 2000);
+            }
+        }
+
+        // Add Task Modal
+        let newTaskCategory = 'in-class';
+        let newTaskSubject = null;
+
+        function showAddTask() {
+            document.getElementById('add-task-modal').classList.remove('hidden');
+        }
+
+        function hideAddTask() {
+            document.getElementById('add-task-modal').classList.add('hidden');
+        }
+
+        function selectCategory(cat) {
+            newTaskCategory = cat;
+            document.getElementById('cat-in-class').className = cat === 'in-class' ? 'btn' : 'btn btn-secondary';
+            document.getElementById('cat-extra').className = cat === 'extracurricular' ? 'btn' : 'btn btn-secondary';
+        }
+
+        function selectSubject(el, subject) {
+            document.querySelectorAll('.subject-item').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            newTaskSubject = subject;
+        }
+
+        function saveTask() {
+            const title = document.getElementById('new-task-title').value;
+            const time = document.getElementById('new-task-time').value;
+
+            if (title) {
+                const subjectNames = {
+                    chinese: '语文', math: '数学', english: '英语',
+                    physics: '物理', chemistry: '化学', biology: '生物',
+                    history: '历史', geography: '地理', politics: '政治'
+                };
+
+                state.tasks.push({
+                    id: Date.now(),
+                    title: title,
+                    category: newTaskCategory,
+                    subject: newTaskSubject || 'other',
+                    subjectName: subjectNames[newTaskSubject] || '其他',
+                    status: 'pending',
+                    reminderTime: time
+                });
+
+                document.getElementById('new-task-title').value = '';
+                hideAddTask();
+                updateUI();
+            }
+        }
+
+        // Set today's date
+        const today = new Date();
+        const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        document.getElementById('today-date').textContent = (today.getMonth() + 1) + '月' + today.getDate() + '日 ' + weekDays[today.getDay()];
+    </script>
+</body>
+</html>

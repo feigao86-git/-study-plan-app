@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "学习计划",
+    "slug": "study-plan-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF8C42"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.studyplan",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF8C42"
+      },
+      "package": "com.yourcompany.studyplan",
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "SCHEDULE_EXACT_ALARM",
+        "USE_EXACT_ALARM"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#FF8C42"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "允许$(PRODUCT_NAME)使用相机来拍摄学习资料吗？"
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "允许$(PRODUCT_NAME)使用麦克风来录制语音备注吗？"
+        }
+      ]
+    ]
+  }
+}
