@@ -1,0 +1,61 @@
+name: Build Android APK (Fixed)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          # Generate package-lock.json if not exists
+          npm install --package-lock-only
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Configure EAS Build
+        run: eas build:configure --platform android --non-interactive || true
+
+      - name: Build Android APK
+        run: eas build --platform android --profile preview --non-interactive --wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Get Build URL
+        id: get_url
+        run: |
+          BUILD_URL=$(eas build:list --platform android --limit 1 --json --non-interactive 2>/dev/null | jq -r '.[0].artifacts.buildUrl // empty')
+          if [ -n "$BUILD_URL" ]; then
+            echo "APK_URL=$BUILD_URL" >> $GITHUB_OUTPUT
+            echo "APK_URL=$BUILD_URL"
+          else
+            echo "No build URL found"
+          fi
+
+      - name: Download APK
+        if: steps.get_url.outputs.APK_URL
+        run: |
+          curl -L -o study-plan-app.apk "${{ steps.get_url.outputs.APK_URL }}"
+          ls -la study-plan-app.apk
+
+      - name: Upload APK artifact
+        if: steps.get_url.outputs.APK_URL
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-plan-app-apk
+          path: study-plan-app.apk
+          retention-days: 30
