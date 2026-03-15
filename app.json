@@ -4,16 +4,8 @@
     "slug": "study-plan-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FF8C42"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "backgroundColor": "#FF8C42",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.studyplan",
@@ -25,10 +17,6 @@
       }
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FF8C42"
-      },
       "package": "com.yourcompany.studyplan",
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
@@ -36,17 +24,7 @@
         "USE_EXACT_ALARM"
       ]
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/notification-icon.png",
-          "color": "#FF8C42"
-        }
-      ],
       [
         "expo-camera",
         {
