@@ -1,0 +1,26 @@
+name: Build APK Simple
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install EAS
+        run: npm install -g eas-cli
+
+      - name: Build APK
+        run: |
+          cd $GITHUB_WORKSPACE
+          npm install
+          eas build --platform android --profile preview --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
